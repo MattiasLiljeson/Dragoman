@@ -13,7 +13,7 @@ public class Block {
 	public List<Variable> m_symbolPairs = new ArrayList<>();
 	public List<Token> m_tokens = new ArrayList<>();
 
-	private int m_pc = -1;
+	private int m_pc = 0;
 
 	public void resetPc() {
 		m_pc = 0;
@@ -35,7 +35,8 @@ public class Block {
 	private void addEndIfNeeded() {
 		Token last = m_tokens.get(m_tokens.size() - 1);
 		if (!last.equals(Token.END)) {
-			Token token = new Token(TokenTypes.ID, Keywords.ID_END, "manualEnd");
+			Token token = new Token(TokenTypes.ID, Keywords.ID_END,
+					"endAddedByPrepForUse");
 			m_tokens.add(token);
 		}
 	}
@@ -44,7 +45,7 @@ public class Block {
 		Token first = m_tokens.get(0);
 		if (!first.equals(Token.BEGIN)) {
 			Token token = new Token(TokenTypes.ID, Keywords.ID_BEGIN,
-					"manualBegin");
+					"beginAddedByPrepForUse");
 			m_tokens.add(0, token);
 		}
 	}

@@ -10,6 +10,7 @@ public class TokenTypes {
 	public static final int FAIL = 6;
 	public static final int LINE = 7;
 	public static final int CALL = 10;
+	public static final int BREAKPOINT = 11;
 
 	public static int fromInt(int p_type) {
 		return p_type;

@@ -1,5 +1,8 @@
 package com.liljeson.mattias.fries.interpretator;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.liljeson.mattias.fries.shared.Block;
 import com.liljeson.mattias.fries.shared.Program;
 import com.liljeson.mattias.fries.shared.Token;
@@ -7,23 +10,27 @@ import com.liljeson.mattias.fries.utils.CompLogger;
 import com.liljeson.mattias.fries.utils.LogLady;
 import com.liljeson.mattias.fries.utils.LogLady.LogLevels;
 
-public class Cradle {
+/**
+ * RDI - Recursive Descent Interpreter
+ * 
+ * @author Mattias Liljeson
+ * 
+ */
+
+public class RDI {
 
 	LogLady m_log = new LogLady(false, LogLevels.ERROR);
 	CompLogger m_compLog = new CompLogger(m_log);
-	// Tokenizer m_tokenizer = new Tokenizer("1+2");
-	// char m_look = '_';
-	// int[] table = new int['z'];
 
 	// Replace with proper stack later
-	// Map<Integer, Symbol> symbols = new HashMap<>();
+	Map<Integer, Integer> m_vars = new HashMap<>();
 
 	Program m_program = null;
 	Block m_currBlock = null;
 	Token m_look;
 	boolean m_abort = false;
 
-	public Cradle(final LogLady p_log, final CompLogger p_compLog) {
+	public RDI(final LogLady p_log, final CompLogger p_compLog) {
 		if (p_compLog != null) {
 			m_compLog = p_compLog;
 		}
@@ -32,43 +39,31 @@ public class Cradle {
 		}
 	}
 
-	public void run(final Program p_program) {
-		// m_tokenizer = new Tokenizer(p_program);
-		// init();
+	public void run(final Program p_program, boolean p_useBreakpoints) {
 		m_program = p_program;
 		m_program.prepForUse();
 		m_currBlock = p_program.getMain();
-		m_look = m_currBlock.getNextToken();
+		m_log.log(LogLevels.INFO, "\n######################\nRunning program: "
+				+ m_program.m_name);
+		interpret(p_useBreakpoints);
 	}
 
-	public void interpret() {
+	public void interpret(boolean p_useBreakpoints) {
+		m_log.log(LogLevels.INFO, "Starting interpretation of program: "
+				+ m_program.m_name);
 		do {
-			// m_log.write( new Integer( expression() ).toString() );
-			switch (m_look.m_type) {
-			// case '?':
-			// input();
-			// break;
-			// case '!':
-			// output();
-			// break;
-			default:
+			getNextToken();
+			if (m_look.isSymbol()) {
 				assignment();
-				break;
+			} else if (p_useBreakpoints && m_look.isBreakpoint()) {
+				m_log.log(LogLevels.INFO,
+						"Hit breakpoint #" + String.valueOf(m_look.m_code));
+				// To continue executing, just call interpret again
+				return;
 			}
-			newLine();
-		} while (m_look.equals(Token.END));
+			// newLine();
+		} while (!m_look.equals(Token.END));
 	}
-
-	void init() {
-		// getChar();
-		// initTable();
-	}
-
-	// void initTable() {
-	// for (int i = 0; i < table.length; i++) {
-	// table[i] = 0;
-	// }
-	// }
 
 	void abort(final String p_msg) {
 		m_log.log(LogLevels.SEVERE, p_msg);
@@ -100,20 +95,6 @@ public class Cradle {
 				"; next token read to look: " + m_look.toString());
 	}
 
-	// void input() {
-	// m_compLog.push();
-	// match('?');
-	// table[getName()] = m_log.read();
-	// m_compLog.pop();
-	// }
-	//
-	// void output() {
-	// m_compLog.push();
-	// match('!');
-	// m_log.WriteLn(table[getName()]);
-	// m_compLog.pop();
-	// }
-
 	void match(final Token p_token) {
 		if (m_look.equals(p_token)) {
 			getNextToken();
@@ -127,42 +108,6 @@ public class Cradle {
 			getNextToken();
 		}
 	}
-
-	// boolean isAddop(final char p_char) {
-	// return p_char == '+' || p_char == '-';
-	// }
-
-	// boolean isAlpha(final char p_char) {
-	// return Character.isLetter(p_char);
-	// }
-	//
-	// boolean isDigit(final char p_char) {
-	// return Character.isDigit(p_char);
-	// }
-
-	// char getName() {
-	// // % returned if look isn't a digit
-	// char name = '%';
-	// if (!isAlpha(m_look)) {
-	// expected("Name");
-	// } else {
-	// name = Character.toUpperCase(m_look);
-	// getNextToken();
-	// }
-	// return name;
-	// }
-
-	// int getNum() {
-	// int num = 0;
-	// if (!isDigit(m_look)) {
-	// expected("Integer");
-	// }
-	// while (isDigit(m_look)) {
-	// num = num * 10 + Integer.parseInt((String.valueOf(m_look)));
-	// getChar();
-	// }
-	// return num;
-	// }
 
 	int getSymbol() {
 		// null returned if look isn't a digit
@@ -254,27 +199,11 @@ public class Cradle {
 		match(Token.BECOME);
 		// table[name] = expression();
 		int val = expression();
-		m_currBlock.setSym(symId, val);
+		// m_currBlock.setSym(symId, val);
+		m_vars.put(symId, val);
 
 		m_compLog.pop();
 	}
-
-	// void add() {
-	// m_compLog.push();
-	// match('+');
-	// term();
-	// emitLn("ADD  (SP)+, D0");
-	// m_compLog.pop();
-	// }
-	//
-	// void subtract() {
-	// m_compLog.push();
-	// match('-');
-	// term();
-	// emitLn("SUB  (SP)+, D0");
-	// emitLn("NEG  D0");
-	// m_compLog.pop();
-	// }
 
 	int factor() {
 		int value;
@@ -285,49 +214,13 @@ public class Cradle {
 			match(Token.LPAR);
 		} else if (m_look.isSymbol()) {
 			int symId = getSymbol();
-			value = m_currBlock.getValue(symId);
+			// value = m_currBlock.getValue(symId);
 			// value = table[getName()]; // ident();
+			value = m_vars.get(symId);
 		} else {
 			value = getNum();
 		}
 		m_compLog.pop();
 		return value;
 	}
-
-	// void ident() {
-	// m_compLog.push();
-	// final char name = getName();
-	// if (m_look == '(') {
-	// match('(');
-	// match(')');
-	// emitLn("BSR " + name);
-	// } else {
-	// emitLn("MOVE " + name + "(PC), D0");
-	// }
-	// m_compLog.pop();
-	// }
-
-	// void multiply() {
-	// m_compLog.push();
-	// match('*');
-	// factor();
-	// emitLn("MULS (SP)+, D0");
-	// m_compLog.pop();
-	// }
-	//
-	// void divide() {
-	// m_compLog.push();
-	// match('/');
-	// factor();
-	// emitLn("MOVE (SP)+, D1");
-	// emitLn("DIVS D1, D0");
-	// m_compLog.pop();
-	// }
-	// {--------------------------------------------------------------}
-	// { Main Program }
-	//
-	// begin
-	// Init;
-	// end.
-	// {--------------------------------------------------------------}
 }

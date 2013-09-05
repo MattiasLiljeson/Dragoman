@@ -3,6 +3,7 @@ package com.liljeson.mattias.fries.shared;
 import com.liljeson.mattias.fries.utils.DeluxeArray;
 
 public class Program {
+	public String m_name = "notSet";
 	public DeluxeArray<Block> m_blocks = new DeluxeArray<>();
 
 	public Block getMain() {

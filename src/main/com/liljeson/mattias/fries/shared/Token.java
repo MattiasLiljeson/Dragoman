@@ -43,16 +43,20 @@ public class Token {
 		return m_type == TokenTypes.LINE;
 	}
 
+	public boolean isBreakpoint() {
+		return m_type == TokenTypes.BREAKPOINT;
+	}
+
+	public boolean isOp() {
+		return m_type == TokenTypes.OP;
+	}
+
 	public boolean isAddOp() {
 		return this.equals(MINUS) || this.equals(PLUS);
 	}
 
 	public boolean isMulOp() {
 		return this.equals(DIV) || this.equals(TIMES);
-	}
-
-	public boolean isOp() {
-		return m_type == TokenTypes.OP;
 	}
 
 	@Override
