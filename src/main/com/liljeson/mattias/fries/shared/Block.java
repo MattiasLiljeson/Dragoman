@@ -1,30 +1,22 @@
 package com.liljeson.mattias.fries.shared;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Block {
-	// static father?
-	// variable declarations?
-
-	public int m_blockNr = -1;
-	// public Block m_parent = null; // Static father
-	public int m_parent = -1; // Static father
-	public List<Variable> m_symbolPairs = new ArrayList<>();
+	public int m_blockId = -1;
+	public int m_parentBlockId = -1; // Static father
+	public Map<Integer, Symbol> m_symbols = new HashMap<>();
 	public List<Token> m_tokens = new ArrayList<>();
 
-	private int m_pc = 0;
-
-	public void resetPc() {
-		m_pc = 0;
-	}
-
 	public Token getToken(int p_idx) {
-		return m_tokens.get(p_idx);
-	}
-
-	public Token getNextToken() {
-		return m_tokens.get(m_pc++);
+		if (0 <= p_idx && p_idx < m_tokens.size()) {
+			return m_tokens.get(p_idx);
+		} else {
+			return null;
+		}
 	}
 
 	public void prepForUse() {
@@ -50,40 +42,19 @@ public class Block {
 		}
 	}
 
-	public Variable getVariable(int p_id) {
-		for (Variable var : m_symbolPairs) {
-			if (var.m_sym.m_id == p_id) {
-				return var;
-			}
-		}
-		return null;
+	public void setSymbol(Symbol p_sym) {
+		m_symbols.put(p_sym.m_id, p_sym);
 	}
 
-	public Symbol getSym(int p_id) {
-		Variable var = getVariable(p_id);
-		if (var != null) {
-			return var.m_sym;
-		} else {
-			return null;
-		}
+	public Symbol getSymbol(int p_id) {
+		return m_symbols.get(p_id);
 	}
 
-	public boolean setSym(int p_id, int p_val) {
-		Variable var = getVariable(p_id);
-		if (var != null) {
-			var.m_val = p_val;
-			return true;
-		} else {
-			return false;
-		}
+	public int getParentBlockId() {
+		return m_parentBlockId;
 	}
 
-	public int getValue(int p_id) {
-		Variable var = getVariable(p_id);
-		if (var != null) {
-			return var.m_val;
-		} else {
-			return -1;
-		}
-	}
+	// public void setParent(int m_parent) {
+	// this.m_parent = m_parent;
+	// }
 }

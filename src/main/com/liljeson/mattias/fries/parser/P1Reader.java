@@ -3,12 +3,11 @@ package com.liljeson.mattias.fries.parser;
 import java.util.List;
 
 import com.liljeson.mattias.fries.shared.Block;
-import com.liljeson.mattias.fries.shared.Kind;
 import com.liljeson.mattias.fries.shared.Program;
 import com.liljeson.mattias.fries.shared.Symbol;
+import com.liljeson.mattias.fries.shared.SymbolKind;
 import com.liljeson.mattias.fries.shared.Token;
 import com.liljeson.mattias.fries.shared.TokenTypes;
-import com.liljeson.mattias.fries.shared.Variable;
 
 public class P1Reader {
 	static Program readProgram(List<String> p_program) {
@@ -18,29 +17,28 @@ public class P1Reader {
 
 	public static Program readProgram(String[] p_program) {
 		Program prog = new Program();
+		int breakPointCnt = 0;
 		for (String line : p_program) {
-			readLine(line, prog);
+			breakPointCnt = readLine(line, prog, breakPointCnt);
 		}
 		return prog;
 	}
 
-	static void readLine(String p_line, Program p_program) {
+	static int readLine(String p_line, Program p_program,
+			int p_breakPointCnt) {
 
 		String[] lineAsArr = split(p_line);
-		int breakPointCnt = 0;
 		int type = getLineType(lineAsArr);
 		if (type != LineTypes.COMMENT) {
 			switch (type) {
 			case LineTypes.VAR_DECL: {
 				Symbol sym = parseVarDecl(lineAsArr);
-				p_program.m_blocks.top().m_symbolPairs
-						.add(new Variable(sym, 0));
+				p_program.m_blocks.top().setSymbol(sym);
 				break;
 			}
 			case LineTypes.ARR_DECL: {
 				Symbol sym = parseArrDecl(lineAsArr);
-				p_program.m_blocks.top().m_symbolPairs
-						.add(new Variable(sym, 0));
+				p_program.m_blocks.top().setSymbol(sym);
 				break;
 			}
 			case LineTypes.BLOCK_DECL:
@@ -52,7 +50,7 @@ public class P1Reader {
 				p_program.m_blocks.top().m_tokens.add(token);
 				break;
 			case LineTypes.BREAKPOINT:
-				Token breakPoint = createBreakPointToken(breakPointCnt++);
+				Token breakPoint = createBreakPointToken(lineAsArr);
 				p_program.m_blocks.top().m_tokens.add(breakPoint);
 
 			case LineTypes.BLOCK_CNT:
@@ -66,11 +64,17 @@ public class P1Reader {
 				break;
 			}
 		}
+		return p_breakPointCnt;
 	}
 
-	private static Token createBreakPointToken(int p_breakPointCnt) {
-		return new Token(TokenTypes.BREAKPOINT, p_breakPointCnt,
-				"BreakpointTokenAddedByP1");
+	private static Token createBreakPointToken(String[] p_line) {
+		String text = "BreakpointTokenAddedByP1";
+		int symId = Integer.parseInt(p_line[2]);
+		int arrIdx = Integer.parseInt(p_line[3]);
+		if (p_line.length > 4) {
+			text = p_line[4];
+		}
+		return new Token(TokenTypes.BREAKPOINT, symId, arrIdx, text);
 	}
 
 	static Symbol parseArrDecl(String[] p_line) {
@@ -94,7 +98,7 @@ public class P1Reader {
 		Symbol sym = new Symbol();
 		sym.m_id = Integer.parseInt(p_line[0]);
 		sym.m_type = Integer.parseInt(p_line[1]);
-		sym.m_kind = new Kind(Integer.parseInt(p_line[2]),
+		sym.m_kind = new SymbolKind(Integer.parseInt(p_line[2]),
 				Integer.parseInt(p_line[3]), Integer.parseInt(p_line[4]),
 				Integer.parseInt(p_line[5]));
 		sym.m_relAdr = Integer.parseInt(p_line[6]);
@@ -104,8 +108,8 @@ public class P1Reader {
 
 	static Block parseBlockDecl(String[] p_line) {
 		Block b = new Block();
-		b.m_blockNr = Integer.parseInt(p_line[0]);
-		b.m_parent = Integer.parseInt(p_line[1]);
+		b.m_blockId = Integer.parseInt(p_line[0]);
+		b.m_parentBlockId = Integer.parseInt(p_line[1]);
 		// Ignore the rest
 		return b;
 	}

@@ -1,34 +1,53 @@
 package com.liljeson.mattias.fries.shared;
 
 public class Token {
-	private static final String MSG = "FromStaticFieldsInClassToken";
+	private static final String MSG = "Comparison Token; ";
 	public static final Token BEGIN = new Token(TokenTypes.ID,
-			Keywords.ID_BEGIN, MSG);
+			Keywords.ID_BEGIN, MSG + "BEGIN");
 	public static final Token END = new Token(TokenTypes.ID, Keywords.ID_END,
-			MSG);
+			MSG + "END");
+	public static final Token IF = new Token(TokenTypes.ID, Keywords.ID_IF,
+			MSG + "IF");
+	public static final Token THEN = new Token(TokenTypes.ID, Keywords.ID_THEN,
+			MSG + "THEN");
+	public static final Token ELSE = new Token(TokenTypes.ID, Keywords.ID_ELSE,
+			MSG + "ELSE");
+	public static final Token SEMICOLON = new Token(TokenTypes.OP,
+			Keywords.TC_SEMI, MSG + "SEMICOLON, ;");
 	public static final Token BECOME = new Token(TokenTypes.OP,
-			Keywords.TC_BECOME, MSG);
+			Keywords.TC_BECOME, MSG + "BECOMES, :=");
 	public static final Token MINUS = new Token(TokenTypes.OP,
-			Keywords.TC_MINUS, MSG);
+			Keywords.TC_MINUS, MSG + "MINS, -");
 	public static final Token PLUS = new Token(TokenTypes.OP, Keywords.TC_PLUS,
-			MSG);
+			MSG + "PLUS, +");
 	public static final Token TIMES = new Token(TokenTypes.OP, Keywords.TC_MUL,
-			MSG);
+			MSG + "TIMES, *");
 	public static final Token DIV = new Token(TokenTypes.OP, Keywords.TC_DIV,
-			MSG);
+			MSG + "DIV, /");
 	public static final Token LPAR = new Token(TokenTypes.OP, Keywords.TC_LPAR,
-			MSG);
+			MSG + "LEFT PARANTHESIS, (");
 	public static final Token RPAR = new Token(TokenTypes.OP, Keywords.TC_RPAR,
-			MSG);
+			MSG + "RIGHT PARANTHESIS, )");
 
 	public int m_type;
 	public int m_code;
+	public int m_extra; // used by breakpoint to store arr idx
 	public String m_text;
+
+	public Token(int p_type, int p_code, int p_extra, String p_text) {
+		m_type = p_type;
+		m_code = p_code;
+		m_extra = p_extra;
+		m_text = p_text;
+
+	}
 
 	public Token(int p_type, int p_code, String p_text) {
 		m_type = p_type;
 		m_code = p_code;
+		m_extra = -1;
 		m_text = p_text;
+
 	}
 
 	public boolean isSymbol() {
@@ -45,6 +64,10 @@ public class Token {
 
 	public boolean isBreakpoint() {
 		return m_type == TokenTypes.BREAKPOINT;
+	}
+
+	public boolean isCall() {
+		return m_type == TokenTypes.CALL;
 	}
 
 	public boolean isOp() {

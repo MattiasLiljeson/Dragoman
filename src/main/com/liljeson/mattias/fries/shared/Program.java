@@ -7,13 +7,13 @@ public class Program {
 	public DeluxeArray<Block> m_blocks = new DeluxeArray<>();
 
 	public Block getMain() {
-		return getBlock(-1);
+		return getBlock(0);
 	}
 
-	public Block getBlock(int p_idx) {
-		for (Block b : m_blocks.arr) {
-			if (b.m_parent == p_idx) {
-				return b;
+	public Block getBlock(int p_blockId) {
+		for (Block block : m_blocks.arr) {
+			if (block.m_blockId == p_blockId) {
+				return block;
 			}
 		}
 		return null;

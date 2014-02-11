@@ -23,6 +23,8 @@ public class P1ReaderTest {
 	static final String[] TOKEN_LINE = { "2", "7", "Line#" };
 	static final String[] VAR_LINE = { "19", "1", "0", "0", "0", "0", "0",
 			"**", "#", "I" };
+	static final String[] FUNC_VAR_LINE = { "19", "1", "3", "0", "0", "0", "0",
+			"**", "#", "F" };
 	static final String[] ARR_LINE = { "20", "1", "1", "1", "0", "0", "1",
 			"**", "1", "2", "6", "A" };
 	static final String[] P1 = {
@@ -32,6 +34,8 @@ public class P1ReaderTest {
 			"  0 -1  1  1   10",
 			"#DEKLARATIONER#",
 			"   19    1    0    0    0    0    0  **   #   I",
+			"   20    1    3    0    0    0    0  **   #   F", // funcvar
+			"   21    1    2    1    1    0    0  **   #   F", // function
 			"#KOD#",
 			"    2    7    Line#",
 			"    3    7    Line#",
@@ -57,18 +61,31 @@ public class P1ReaderTest {
 		Program prog = P1Reader.readProgram(P1);
 		assertEquals("Block cnt", 1, prog.m_blocks.size());
 		Block b = prog.m_blocks.get(0);
-		assertEquals("First token type", TokenTypes.LINE,
-				b.m_tokens.get(0).m_type);
-		assertEquals("Last token type", TokenTypes.ID,
-				b.m_tokens.get(9).m_type);
-		assertEquals("Variable ID", 19,
-				b.m_symbolPairs.get(0).m_sym.m_id);
-		assertEquals("Variable type", SymbolTypes.INT,
-				b.m_symbolPairs.get(0).m_sym.m_type);
-		assertEquals("Variable kind", SymbolKinds.SIMPLE,
-				b.m_symbolPairs.get(0).m_sym.m_kind.m_kind);
-		assertEquals("Variable name", "I",
-				b.m_symbolPairs.get(0).m_sym.m_name);
+
+		assertEquals("First token type", TokenTypes.LINE, b.getToken(0).m_type);
+		assertEquals("Last token type", TokenTypes.ID, b.getToken(9).m_type);
+
+		// std var
+		assertEquals("Symbol ID", 19, b.getSymbol(19).m_id);
+		assertEquals("Symbol type", SymbolTypes.INT, b.getSymbol(19).m_type);
+		assertEquals("Symbol kind", SymbolKinds.SIMPLE,
+				b.getSymbol(19).m_kind.m_kind);
+		assertEquals("Symbol name", "I", b.getSymbol(19).m_name);
+
+		// funcvar
+
+		assertEquals("Symbol ID", 20, b.getSymbol(20).m_id);
+		assertEquals("Symbol type", SymbolTypes.INT, b.getSymbol(20).m_type);
+		assertEquals("Symbol kind", SymbolKinds.FUNC_VAL,
+				b.getSymbol(20).m_kind.m_kind);
+		assertEquals("Symbol name", "F", b.getSymbol(20).m_name);
+
+		// std var
+		assertEquals("Symbol ID", 21, b.getSymbol(21).m_id);
+		assertEquals("Symbol type", SymbolTypes.INT, b.getSymbol(21).m_type);
+		assertEquals("Symbol kind", SymbolKinds.FUNC,
+				b.getSymbol(21).m_kind.m_kind);
+		assertEquals("Symbol name", "F", b.getSymbol(21).m_name);
 	}
 
 	@Test
@@ -78,10 +95,9 @@ public class P1ReaderTest {
 
 	@Test
 	public void testParseBlockDecl() {
-
 		Block b = P1Reader.parseBlockDecl(BLOCK_DECL_LINE);
-		assertEquals("BlockNr", 0, b.m_blockNr);
-		assertEquals("Parent", -1, b.m_parent);
+		assertEquals("BlockNr", 0, b.m_blockId);
+		assertEquals("Parent", -1, b.m_parentBlockId);
 	}
 
 	@Test
@@ -94,7 +110,6 @@ public class P1ReaderTest {
 
 	@Test
 	public void testParseArrDecl() {
-
 		Symbol s = P1Reader.parseArrDecl(ARR_LINE);
 		assertEquals("Idx", 1, s.m_index);
 		assertEquals("Low", 2, s.m_lowLimit);
@@ -104,9 +119,15 @@ public class P1ReaderTest {
 
 	@Test
 	public void testParseVarDecl() {
-
 		Symbol s = P1Reader.parseVarDecl(VAR_LINE);
 		assertEquals("Name", "I", s.m_name);
+	}
+
+	@Test
+	public void testParseFuncVarDecl() {
+		Symbol s = P1Reader.parseVarDecl(FUNC_VAR_LINE);
+		assertEquals("Name", "F", s.m_name);
+		assertEquals("Kind", SymbolKinds.FUNC_VAL, s.m_kind.m_kind);
 	}
 
 	@Test
