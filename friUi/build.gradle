@@ -1,0 +1,12 @@
+apply plugin: 'groovy'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.3.+'
+    testCompile 'junit:junit:4.+'
+    compile project(':friNt')
+}
