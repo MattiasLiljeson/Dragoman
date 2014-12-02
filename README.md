@@ -1,0 +1,99 @@
+﻿Uppgift i interpretatorteknik
+=============================
+
+Detta är inlämningen till ovanstående uppgift. Inlämningen består av två delar,
+en intrepretatorbackend samt ett användargränssnitt i form av ett CLI (Command
+line Interface). Interpretatorn konverterar p1-filer till ett internt format
+som sedan exekveras. Då jag inte haft tillgång till lexern som konverterar prg
+till p1 har jag byggt interpretatorn med de p1-program jag haft till
+förfogande. 
+
+Övergripande
+------------
+Interpretatorn är skriven i Java och CLIt är skrivet i Groovy vilket är ett
+språk som körs på Javas JVM. För att bygga en komplett interpretator med
+backend och frontend används byggverktyget Gradle. Gradle bygger, testar samt
+paketerar hela paketet som en JAR.
+
+Hur bygger man och kör projektet?
+---------------------------------
+För att bygga projektet krävs det att Java samt Groovy är installerat och att
+båda är av en någorlunda modern variant. Gradle dras ner automagiskt av ett
+wrapperskript. För att bygga gör man sedan som följer:
+
+ 1. Stega in i katalogen friesinterpretator
+ 2. Kör kommandot `gradlew build jar friUi:uberjar`. I friUi/build/libs ligger
+ nu friUi.jar.
+ 3. Exekvera jaren med: java -jar friUi/build/libs/friUi.jar -i program.p1
+
+Det finns en hög med switchar dessa listas med switchen -h eller --help. Det
+som framförallt är intressant är troligen loggnivåerna där olika mängd
+information om interpreteringen skrivs ut beroende på vald loggnivå. 
+
+
+Enhetstester / unit tests
+-------------------------
+Interpretatorn är utvecklad enligt principen *test driven development*. Det
+finns därför en stor mängd testfall som testar features och färdiga program.
+Dessa återfinns i friNt/src/test. Dessa är modifierade med s.k. checkpoints där
+värden sparas undan. Dessa värden jämförs sedan med sedan referensvärden. På
+detta sättet säkerställs interpretatorns funktionalitet. För att kunna testa
+input/output kan interpretatorn köras i icke-interaktivt läge. Då används
+antingen förbestämda värden alt. defaultvärden om förbestämda värden ej finns
+definerade.
+
+Interpretatorn 
+--------------
+För att kunna följa exekveringen finns det en simpel logger samt ett verktyg
+som används för att visualisera djupet på rekursionen i parsern. Denna loggar
+till nivån INFO.
+
+Interpretatorn är en enkel enpass (Eller tvåpass då lexningen och blockanalysen
+redan är gjord) med recursive-descent-parsning. Den exekverar kod samtidigt som
+den körs. Den är relativt liten och kompakt i sig men innehåller en hel del
+debugutskrifter samt stöd för detta som gör att den blir lite knubbigare.
+Denna parser parsear block som i sin tur kan kalla andra block samt sitt eget
+block. Den är alltså blockbaserad, även om ett helt program kan hanteras som
+ett block. Då saknas dock stödet för lokala variabler. Bredvid detta finns en
+stack. För varje block som exekveras läggs det till en ny stackram med plats
+för blockets variabler etc. På detta sättet är dynamisk samt statisk fader
+strikt skilda. 
+
+Stöd finns för följande:
+ - Operatorer med korrekt företräde (precedence) inkl parenteser.
+ - Variabler, av heltalstyp. 
+ - Arrayer.
+ - Funktionsanrop med parametrar.
+ - Booleanska uttryck.
+
+Operatorföreträde sker via recursive descent och ej med en matris. Detta för
+enkelhetens skull. Vill man ha stöd för att blanda booleanska uttryck och
+operatorer är en matrislösning kanske en smidigare lösning.
+
+Stödet för booleanska uttryck är begränsat. Det går inte att blanda operatorer
+och booleanska uttryck då det inte sker ngn recursive descent inuti de
+booleanska uttrycken. Detta är tekniskt möjligt men kan ge väldigt djup
+rekursion vilket kan vara ett problem på klen hårdvara (inbyggda system modell
+80-tal) och kommer garanterat ge låg prestanda. Att utöka med stöd för detta
+kan dock ske med enkelhet.
+
+Interpretatorn har stöd för variabler av typen heltal. Den är förberedd för
+andra typer (flyttal ex) men detta är ej slutfört. 
+
+Funktionsanrop har bara stöd för en parameter för tillfället. Interpretatorn ör
+förberedd för flera parametrar men då det saknats testprogram med fler
+parametrar har det stödet inte slutförts.
+
+Utbyggbarhet
+------------
+Interpretatorn kör program där blockanalys redan är gjord. I övrigt är den
+relativt generell och bör utan problem kunna ta de flesta språk av Algol-typ.
+För att utöka med stöd för andra språk måste en lexer med blockanalys
+konstrueras som skriver till ett vettigt mellanformat. Man måste sedan skriva
+en importör av detta mellanformat likt den som finns idag för p1-filer. 
+
+Det finns idag ett par saker som inte är slutförda men som är förberedda,
+däribland stöd för flera typer, stöd för sammansatta uttryck. Att slutföra
+detta är dock inget större jobb.
+
+Mycket nöje!

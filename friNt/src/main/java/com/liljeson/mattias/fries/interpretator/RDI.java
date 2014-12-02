@@ -129,10 +129,10 @@ public class RDI {
 		m_log.write( "\t" + p_msg );
 	}
 
-	public void run( final Program p_program, boolean p_useCheckpoints,
+	public void run( final Program p_program, boolean p_useBreakpoints,
 			boolean p_interactive ) {
 		m_interactive = p_interactive;
-		m_useCheckpoints = p_useCheckpoints;
+		m_useCheckpoints = p_useBreakpoints;
 		m_program = p_program;
 		m_program.prepForUse();
 		m_log.log( LogLevels.INFO, "Running program: " + m_program.m_name );
