@@ -30,6 +30,12 @@ Det finns en hög med switchar dessa listas med switchen -h eller --help. Det
 som framförallt är intressant är troligen loggnivåerna där olika mängd
 information om interpreteringen skrivs ut beroende på vald loggnivå. 
 
+För att kika runt i koden används lämpligt verktyg, ex vi/vim. Vill man köra
+enhetstester rekommenderas en modern version av eclipse. För att kunna öppna
+projekten i eclipse kör man kommandot `gradlew eclipse`. Då genereras
+projektfiler för eclipse upp av Gradle. Från eclipse väljer man sedan att
+importera projekt och pekar då på projektkatalogen varefter backend och
+frontend importeras och blir körbara inifrån eclipse.
 
 Enhetstester / unit tests
 -------------------------
