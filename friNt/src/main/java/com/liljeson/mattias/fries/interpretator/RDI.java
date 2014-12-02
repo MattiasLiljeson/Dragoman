@@ -30,10 +30,10 @@ public class RDI {
 
 	Program m_program = null;
 	boolean m_abort = false;
-	DeluxeArray< Integer > m_breaks = new DeluxeArray<>();
+	DeluxeArray< Integer > m_checks = new DeluxeArray<>();
 	DeluxeArray< Integer > m_input = new DeluxeArray<>();
 
-	boolean m_useBreakpoints;
+	boolean m_useCheckpoints;
 	boolean m_interactive = true;
 	Variable m_lastBlockVar = null;
 
@@ -129,10 +129,10 @@ public class RDI {
 		m_log.write( "\t" + p_msg );
 	}
 
-	public void run( final Program p_program, boolean p_useBreakpoints,
+	public void run( final Program p_program, boolean p_useCheckpoints,
 			boolean p_interactive ) {
 		m_interactive = p_interactive;
-		m_useBreakpoints = p_useBreakpoints;
+		m_useCheckpoints = p_useCheckpoints;
 		m_program = p_program;
 		m_program.prepForUse();
 		m_log.log( LogLevels.INFO, "Running program: " + m_program.m_name );
@@ -178,7 +178,7 @@ public class RDI {
 	void statement() {
 		m_compLog.push();
 		if( look().isBreakpoint() ) {
-			breakpoint();
+			checkpoint();
 		} else if( look().isCall() ) {
 			callBlock();
 		} else if( look().isSymbol() ) {
@@ -277,17 +277,17 @@ public class RDI {
 		m_compLog.pop();
 	}
 
-	private void breakpoint() {
+	private void checkpoint() {
 		m_compLog.push();
-		if( m_useBreakpoints ) {
+		if( m_useCheckpoints ) {
 			int val = -1;
 			try {
 				val = m_vars.getVar( look().m_code ).getInt( look().m_extra );
 			} catch( WrongTypeException e ) {
 				e.printStackTrace();
 			}
-			m_breaks.push( val );
-			String msg = "Hit breakpoint for symbol #"
+			m_checks.push( val );
+			String msg = "Hit checkpoint for symbol #"
 					+ String.valueOf( look().m_code ) + ": " + look().m_text
 					+ " = " + val;
 			m_log.log( LogLevels.INFO, msg );
@@ -375,7 +375,7 @@ public class RDI {
 		if( p_text.equals( "write" ) ) {
 			int expr = getParenthesisExpr();
 			m_log.write( expr );
-			m_breaks.push( expr );
+			m_checks.push( expr );
 		} else if( p_text.equals( "writln" ) ) {
 			m_log.writeLn();
 		} else if( p_text.equals( "readint" ) ) {
