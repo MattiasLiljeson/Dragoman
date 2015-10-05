@@ -1,17 +1,17 @@
 package com.liljeson.mattias.fries.ui
 
-import com.liljeson.mattias.fries.interpretator.RDI;
-import com.liljeson.mattias.fries.parser.P1Reader;
-import com.liljeson.mattias.fries.shared.Program;
-import com.liljeson.mattias.fries.utils.CompLogger;
-import com.liljeson.mattias.fries.utils.LogLady;
-import com.liljeson.mattias.fries.utils.LogLady.Details;
-import com.liljeson.mattias.fries.utils.LogLady.LogLevels;
+import com.liljeson.mattias.fries.interpretator.RDI
+import com.liljeson.mattias.fries.parser.P1Reader
+import com.liljeson.mattias.fries.shared.Program
+import com.liljeson.mattias.fries.utils.CompLogger
+import com.liljeson.mattias.fries.utils.LogLady
+import com.liljeson.mattias.fries.utils.LogLady.Details
+import com.liljeson.mattias.fries.utils.LogLady.LogLevels
 
 class Cli {
 	static main( args ){
-		
-		def cli = new CliBuilder(usage: 'friesUi.groovy -[hdlaci] <path to p1 file>')
+
+		def cli = new CliBuilder(usage: 'intercli.groovy -[hdlaci] <path to p1 file>')
 		// Create the list of options.
 		cli.with {
 			h longOpt: 'help', 'Show usage information'
@@ -21,19 +21,19 @@ class Cli {
 			c longOpt: 'checkpoints', argName: 'checkpoints', 'Use checkpoints. If not specified, checkpoints are disabled.'
 			i longOpt: 'interactive', argName: 'interactive', 'Fetch input from user. If not specified, input is read from a buffer if existing, otherwise a default value is used for all input.'
 		}
-		
+
 		def options = cli.parse( args )
 		if( !options ){
 			println "Error when parsing the options! Quitting..."
 			return
 		}
-		
+
 		if( options.h ) {
 			// Show usage text when -h or --help option is used.
 			cli.usage()
 			return
 		}
-		
+
 		// Handle all non-option arguments.
 		String prgFilePath = "prog.p1"
 		def extraArguments = options.arguments()
@@ -46,7 +46,7 @@ class Cli {
 			println "You must specify a program to interpret! Quitting..."
 			return
 		}
-		
+
 		def details = Details.LEVEL // Default.
 		if ( options.d ) {
 			details = Details.valueOf( options.d )
@@ -71,7 +71,7 @@ class Cli {
 		LogLady logLady = new LogLady( details, level )
 		CompLogger compLady = new CompLogger( logLady )
 		RDI rdi = new RDI( logLady, compLady )
-		
+
 		String[] programLines
 		try{
 			programLines = readProgram( prgFilePath )
@@ -86,7 +86,7 @@ class Cli {
 		program.m_name = alias;
 		rdi.run( program, checkpoints, interactive );
 	}
-	
+
 	static String[] readProgram( String filepath ){
 		return new File(filepath).readLines().toArray(new String[1])
 	}
