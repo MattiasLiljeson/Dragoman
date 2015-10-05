@@ -12,7 +12,7 @@ dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.3.+'
     testCompile 'junit:junit:4.+'
 	compile "commons-cli:commons-cli:+"
-    compile project(':friNt')
+    compile project(':inter')
 }
 
 task uberjar(type: Jar) {
