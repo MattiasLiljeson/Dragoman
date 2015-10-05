@@ -1,6 +1,5 @@
 ﻿Uppgift i interpretatorteknik
 =============================
-
 Detta är inlämningen till ovanstående uppgift. Inlämningen består av två delar,
 en intrepretatorbackend samt ett användargränssnitt i form av ett CLI (Command
 line Interface). Interpretatorn konverterar p1-filer till ett internt format
@@ -15,16 +14,28 @@ språk som körs på Javas JVM. För att bygga en komplett interpretator med
 backend och frontend används byggverktyget Gradle. Gradle bygger, testar samt
 paketerar hela paketet som en JAR.
 
+Hur kör man projektet?
+----------------------
+Då långt ifrån alla har Groovy installerat har jag byggt en jar innehållandes
+backend och frontend där det räcker med att ha java installerat för att köra.
+Den ligger i huvudkatalogen.
+
+För att köra: `java -jar interpret.jar -i <program>.p1`. Där <program> är ett
+program som lexern konverterat till mellanformatet p1. De p1-filer som följde
+med uppgiften är medskickade i denna inlämning. De ligger i katalogen
+`docs/Tester`.
+
 Hur bygger man och kör projektet?
 ---------------------------------
 För att bygga projektet krävs det att Java samt Groovy är installerat och att
 båda är av en någorlunda modern variant. Gradle dras ner automagiskt av ett
 wrapperskript. För att bygga gör man sedan som följer:
 
- 1. Stega in i katalogen friesinterpretator
- 2. Kör kommandot `gradlew build jar friUi:uberjar`. I friUi/build/libs ligger
- nu friUi.jar.
- 3. Exekvera jaren med: java -jar friUi/build/libs/friUi.jar -i program.p1
+ 1. Stega in i katalogen src
+ 2. Kör kommandot `gradlew build jar intercli:uberjar`. I intercli/build/libs
+     ligger nu friUi.jar.
+ 3. Exekvera jaren med: 
+     `java -jar intercli/build/libs/friUi.jar -i <program>.p1`
 
 Det finns en hög med switchar dessa listas med switchen -h eller --help. Det
 som framförallt är intressant är troligen loggnivåerna där olika mängd
@@ -83,8 +94,9 @@ rekursion vilket kan vara ett problem på klen hårdvara (inbyggda system modell
 80-tal) och kommer garanterat ge låg prestanda. Att utöka med stöd för detta
 kan dock ske med enkelhet.
 
-Interpretatorn har stöd för variabler av typen heltal. Den är förberedd för
-andra typer (flyttal ex) men detta är ej slutfört. 
+Interpretatorn har stöd för variabler av typen heltal samt strängar med viss
+begränsning. Den är förberedd för andra typer (flyttal ex) men detta är ej
+slutfört. 
 
 Funktionsanrop har bara stöd för en parameter för tillfället. Interpretatorn ör
 förberedd för flera parametrar men då det saknats testprogram med fler
