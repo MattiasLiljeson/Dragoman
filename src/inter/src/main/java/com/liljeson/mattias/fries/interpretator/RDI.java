@@ -12,6 +12,7 @@ import com.liljeson.mattias.fries.utils.CompLogger;
 import com.liljeson.mattias.fries.utils.DeluxeArray;
 import com.liljeson.mattias.fries.utils.LogLady;
 import com.liljeson.mattias.fries.utils.LogLady.Details;
+import com.liljeson.mattias.fries.utils.LogLady.InputException;
 import com.liljeson.mattias.fries.utils.LogLady.LogLevels;
 
 /**
@@ -47,17 +48,15 @@ public class RDI {
 	}
 
 	void abort( final String p_msg ) {
-		m_log.log( LogLevels.SEVERE, p_msg );
-		m_abort = true;
-		try {
-			throw new Exception();
-		} catch( final Exception e ) {
-			e.printStackTrace();
-		}
+		abortAndLog( p_msg, LogLevels.SEVERE );
 	}
 
 	void error( final String p_msg ) {
-		m_log.log( LogLevels.ERROR, p_msg );
+		abortAndLog( p_msg, LogLevels.ERROR );
+	}
+
+	private void abortAndLog( final String p_msg, LogLevels p_level ) {
+		m_log.log( p_level, p_msg );
 		m_abort = true;
 		try {
 			throw new Exception();
@@ -73,8 +72,7 @@ public class RDI {
 	Token getNextToken() {
 		Token tok = m_vars.getNextToken();
 		if( look() != null ) {
-			m_log.log( LogLevels.DEBUG, "; next token read to look: "
-					+ look().m_text );
+			m_log.log( LogLevels.DEBUG, "; next token read to look: " + look().m_text );
 		} else {
 			m_log.log( LogLevels.DEBUG, "; next token read to look: null" );
 		}
@@ -231,7 +229,6 @@ public class RDI {
 		m_compLog.push();
 		m_compLog.pop();
 		if( !op.isOp() ) {
-			m_abort = true;
 			error( "Is not operator!" );
 		} else {
 			if( op.m_code == Keywords.TC_EQUAL ) {
@@ -247,7 +244,6 @@ public class RDI {
 			} else if( op.m_code == Keywords.TC_GE ) {
 				return lhs >= rhs;
 			} else {
-				m_abort = true;
 				error( "Is not relation operator!" );
 			}
 		}
@@ -380,22 +376,29 @@ public class RDI {
 			m_log.writeLn();
 		} else if( p_text.equals( "readint" ) ) {
 			if( m_interactive ) {
-				val = m_log.read();
+				val = read();
 				m_log.log( LogLevels.INFO, "read input from user: " + val );
 			} else {
 				if( m_input.size() > 0 ) {
 					val = m_input.pop();
-					m_log.log( LogLevels.INFO, "read input from input buffer: "
-							+ val );
+					m_log.log( LogLevels.INFO, "read input from input buffer: " + val );
 				} else {
 					val = -2;
-					m_log.log( LogLevels.INFO, "input buffer empty. used: "
-							+ val );
+					m_log.log( LogLevels.INFO, "input buffer empty. used: "	+ val );
 				}
 			}
 		}
 		m_compLog.pop();
 		return val;
+	}
+
+	private int read() {
+		try {
+			return m_log.read();
+		} catch( InputException e ) {
+			m_log.log( LogLevels.ERROR, e.getMessage()+ " Aborting!" );
+			throw new RuntimeException(e.getMessage());
+		}
 	}
 
 	int userDefinedSymbol( int symId, Symbol sym ) {
@@ -423,7 +426,6 @@ public class RDI {
 
 	void unsupportedSym( Symbol sym ) {
 		m_compLog.push();
-		m_abort = true;
 		error( "; unrecognized symbol format \"" + sym.m_name + "\"" );
 		m_compLog.pop();
 	}

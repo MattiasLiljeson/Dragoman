@@ -20,10 +20,6 @@ public class RDITest {
 	final RDI m_rdi = new RDI( m_logLady, m_compLady );
 	Program m_program = null;
 
-	// @Before
-	// public void setUp() throws Exception {
-	// }
-
 	@Test
 	public void testRunTst0() {
 		m_program = P1Reader.readProgram( RDITestData.TST0 );
