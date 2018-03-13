@@ -1,7 +1,7 @@
 Dragoman
 ========
 Dragoman is a simple recursive-descent interpreter written in Java with a CLI written in Groovy.
-It is inspired by Crenshaw's 'Lets build a compiler' and was origanlly written for an assignment in interpreter technology.
+It is inspired by Crenshaw's 'Lets build a compiler' and was originally written for an assignment in interpreter technology.
 The interpreter is therefore simple and should be an easy read,
 while still having support for quite a few simple language constructs.
 
